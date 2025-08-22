@@ -12,10 +12,13 @@ button_search_up_applications = "Durchlauf starten";
 app_search_up_desc = "Relevante Apps werden hier nach einem Durchlauf angezeigt. Relevante Apps sollten durchgeschaut und nach Möglichkeit manuell exportiert werden.\n\n*Es können mehr relevante Apps vorhanden sein, als aufgeführt.*";
 
 // Backup
+backup_name = "Sicherung";
 path_desc = "Kein Pfad ausgewählt";
 directory_list_selected = "Auswahl der zu kopierenden Verzeichnisse";
 target_path_select = "Zielpfad wählen:";
 selected_dir_amount = "Augewählte Verzeichnisse";
+
+backupname_info = "Bezeichnung";
 
 dmg_container_toggle_desc = "DMG-Container und MD5-Hash erstellen:";
 dmg_container_info = "Das zusätzliche Erstellen eines Containers benötigt die doppelte Menge an Speicherplatz!\n";
@@ -26,7 +29,7 @@ process_start = "Vorgang starten";
 finished_task = "Fertiggestellt";
 
 dmg_creation_step = "Erstelle DMG";
-dmg_creation_step = "Erstelle MD5";
+md5_creation_step = "Erstelle MD5";
 
 // Extras
 create_dmg = "Erstelle DMG von Ordner";

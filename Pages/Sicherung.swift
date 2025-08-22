@@ -8,7 +8,183 @@
 import SwiftUI
 import AppKit
 
+struct LandingPage_Previews: PreviewProvider {
+    static var previews: some View {
+        LandingPage()
+    }
+}
+
+
 struct LandingPage: View {
+    
+    // Function to count selected directories
+    private func selectedCount() -> Int {
+        return selectedItems.filter { $0.value }.count
+    }
+
+    // Selecting target folder
+    private func selectTargetFolder() {
+        let openPanel = NSOpenPanel()
+        openPanel.canChooseDirectories = true
+        openPanel.canChooseFiles = false
+        openPanel.allowsMultipleSelection = false
+        openPanel.canCreateDirectories = true
+      
+        openPanel.beginSheetModal(for: NSApplication.shared.mainWindow!) { response in
+            if response == .OK {
+                if let url = openPanel.url {
+                    DispatchQueue.main.async {
+                        self.targetPath = url.path
+                        targetPathIsSet = true
+                    }
+                }
+            }
+        }
+    }
+
+    // Function to select or deselect all items
+    private func selectAll() {
+        let allSelected = !selectedItems.values.allSatisfy { $0 }
+        for key in selectedItems.keys {
+            selectedItems[key] = allSelected
+        }
+    }
+
+    // Computed property to determine if the copy button should be enabled
+    private var isCopyButtonEnabled: Bool {
+        return selectedCount() > 0 && targetPathIsSet != false
+    }
+    
+    // Asynchronous function to start copying
+    public func startCopy() async {
+        let selectedKeys = selectedItems.filter { $0.value }.map { $0.key }
+        var selectedPaths: [URL] = []
+        for key in selectedKeys {
+            selectedPaths.append(userDirectory.appendingPathComponent(key))
+        }
+        let folderPath = targetPath + "/\(backupName)"
+        // Check if the folder already exists
+        TerminalClient.runCommandOpen("mkdir -p \(folderPath)")
+
+        // Convert targetPath to URL
+        let targetURL = URL(fileURLWithPath: folderPath)
+        let targetRootURL = targetURL.deletingLastPathComponent()
+        
+        guard let errorLogFile = FileLogger.createErrorLog(
+            targetPath: targetRootURL,
+            userName: currentUserName
+        ) else {
+            print("Failed to create error log file.")
+            return
+        }
+        
+        // Create log file
+        guard let logFileURL = FileLogger.createCopyLog(
+            sourcePaths: selectedPaths,
+            targetPath: targetRootURL,
+            userName: currentUserName
+        ) else {
+            FileLogger.appendToLog(logFileURL: errorLogFile, message: "Failed to create log file.")
+            return
+        }
+        
+        FileLogger.createDeviceLog(
+            targetPath: targetRootURL,
+            userName: currentUserName
+        )
+        
+        FileLogger.appendToLog(
+            logFileURL: logFileURL,
+            message: "\(FileLogger.createCurrentTimeStamp()) | Device Log created"
+        )
+        
+        FileLogger.appendToLog(
+            logFileURL: logFileURL,
+            message: "\(FileLogger.createCurrentTimeStamp()) | Error Log created \n"
+        )
+        
+        // Perform the copy operations asynchronously
+        for path in selectedPaths {
+            progressMessagePath = "Current Path: \(path.absoluteString)"
+            let lastSourceComponent = path.lastPathComponent
+            
+            // create root folder for each dir
+            let newTargetUrl = targetURL.appendingPathComponent(lastSourceComponent)
+            do {
+                try FileManager.default.createDirectory(at: newTargetUrl, withIntermediateDirectories: true, attributes: nil)
+                
+                FileLogger.appendToLog(
+                    logFileURL: logFileURL,
+                    message: "\n\nCreated Root Folder: \(lastSourceComponent)"
+                )
+            }
+            catch
+                {
+                FileLogger.appendToLog(
+                    logFileURL: errorLogFile,
+                    message: "\nFailed to create Root Folder: \(lastSourceComponent)"
+                )
+            }
+            
+            await CopyClient().copyFiles(sourcePath: path, targetPath: newTargetUrl, statusLog: logFileURL, errorLog: errorLogFile)
+            
+            progressCount += 1
+            progress = Double(progressCount) / Double(selectedPaths.count)
+            
+            let percentage = (progress * 100).rounded()
+            progressMessage = "\(percentage)%"
+            
+            await MainActor.run {
+                self.progressMessage = "\(percentage)%"
+                self.progressMessagePath = "Current Path: \(path.absoluteString)"
+            }
+            
+            await Task.yield() // ← This forces UI to update before next iteration
+        }
+        
+        if (containerCreation) {
+            progressMessagePath = ""
+            // Create DMG
+            progressMessage = Localizable("dmg_creation_step")
+            await CopyClient().createDMG(targetUrl: targetURL)
+
+            
+            // Hash MD5 DMG
+            progressMessage = Localizable("md5_creation_step")
+            let dmgName = targetURL.lastPathComponent
+            let finalTargetPath = targetURL.deletingLastPathComponent()
+            let dmgUrl = finalTargetPath.appendingPathComponent("\(dmgName).dmg")
+            let md5Hash = await CopyClient().md5OfDMG(dmgUrl: dmgUrl)
+            
+            FileLogger.appendToLog(logFileURL: logFileURL, message: """
+            \n\n
+            MD5 Hash Log
+            -----------------
+            Date: \(FileLogger.createCurrentTimeStamp())
+            -----------------\n
+            DMG Name: \(dmgName)
+            Hash: \(md5Hash ?? "Error")\n
+            """)
+        }
+        
+        // Update states after copying is complete
+        isCopying = false
+        finishedTask = true
+        progressMessagePath = "Starting..."
+        progressMessage = "0%"
+        selectedItems = [
+            "Documents": false,
+            "Downloads": false,
+            "Desktop": false,
+            "Public": false,
+            "Music": false,
+            "Movies": false,
+            "Pictures": false
+        ]
+        progress = 0.0
+        progressCount = 0
+    }
+    
     @State private var selectedItems: [String: Bool] = [
         "Documents": true,
         "Downloads": true,
@@ -22,11 +198,12 @@ struct LandingPage: View {
     @State public var isCopying: Bool = false // state if copying is in progress or not
     @State public var finishedTask: Bool = false // state if copying is finished
     @State public var progress = 0.0 // progress of copying
-    @State public var progressMessage = ""
-    @State public var progressMessagePath = ""
+    @State public var progressMessage = "0%"
+    @State public var progressMessagePath = "Starting..."
     @State public var progressCount = 0
     @State public var folderCountMax = 7
-    @State private var containerCreation : Bool = true
+    @State public var backupName = Localizable("backup_name")
+    @State private var containerCreation: Bool = true
     
     @AppStorage("isDarkMode") private var isDarkMode: Bool = true
     @AppStorage("selectedLanguage") private var selectedLanguage: String = "German"
@@ -41,6 +218,7 @@ struct LandingPage: View {
     // State variable for target path
     @State private var targetPath: String = Localizable("path_desc")
     @State private var targetPathIsSet: Bool = false
+
 
     var body: some View {
         VStack {
@@ -100,7 +278,18 @@ struct LandingPage: View {
                     }
                 }
             }
-            .padding()
+            .padding(.top, 10)
+            
+            // Backup Name Textbox
+            HStack {
+                Text(Localizable("backupname_info") + ":")
+                    .font(.headline)
+                
+                TextField("Enter a name for the backup", text: $backupName)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .frame(width: 250)
+            }
+            .padding(10)
                 
             // Create DMG + MD5 selection
             VStack {
@@ -167,200 +356,35 @@ struct LandingPage: View {
                 }
             }
             .padding(.bottom, 10.0)
-            
-            if isCopying {
-                VStack{
-                    Text("\(progressMessage)")
-                        .font(.body)
-                    Text("\(progressMessagePath)")
-                        .font(.body)
-                    ProgressView(value: progress, total: 1.0)
-                        .progressViewStyle(LinearProgressViewStyle())
-                        .frame(height: 30.0)
-                }
-                .padding(.bottom, 50.0)
-            }
-                
-            if finishedTask {
-                Text(Localizable("finished_task") + "!")
-                    .font(.headline)
-                    .foregroundColor(.green)
-                    .padding()
-            }
         }
         .frame(alignment: .top)
         .onChange(of: selectedLanguage) { _, newValue in
             localization.selectedLanguage = newValue
         }
-    }
-
-    // Function to count selected directories
-    private func selectedCount() -> Int {
-        return selectedItems.filter { $0.value }.count
-    }
-
-    // Selecting target folder
-    private func selectTargetFolder() {
-        let openPanel = NSOpenPanel()
-        openPanel.canChooseDirectories = true
-        openPanel.canChooseFiles = false
-        openPanel.allowsMultipleSelection = false
-        openPanel.canCreateDirectories = true
-      
-        openPanel.beginSheetModal(for: NSApplication.shared.mainWindow!) { response in
-            if response == .OK {
-                if let url = openPanel.url {
-                    DispatchQueue.main.async {
-                        self.targetPath = url.path
-                        targetPathIsSet = true
+        .overlay(
+            Group {
+                if isCopying {
+                    VStack {
+                        Text(progressMessage + "\n" + progressMessagePath)
+                            .font(.title)
+                            .bold()
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.black.opacity(0.8))
+                            .cornerRadius(10)
+                            .shadow(radius: 10)
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .padding()
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.black.opacity(0.25))
+                    .edgesIgnoringSafeArea(.all)
+                    .transition(.opacity)
+                    .animation(.easeInOut, value: isCopying)
                 }
             }
-        }
-    }
-
-    // Function to select or deselect all items
-    private func selectAll() {
-        let allSelected = !selectedItems.values.allSatisfy { $0 }
-        for key in selectedItems.keys {
-            selectedItems[key] = allSelected
-        }
-    }
-
-    // Computed property to determine if the copy button should be enabled
-    private var isCopyButtonEnabled: Bool {
-        return selectedCount() > 0 && targetPathIsSet != false
-    }
-    
-    // Asynchronous function to start copying
-    public func startCopy() async {
-        let selectedKeys = selectedItems.filter { $0.value }.map { $0.key }
-        var selectedPaths: [URL] = []
-        for key in selectedKeys {
-            selectedPaths.append(userDirectory.appendingPathComponent(key))
-        }
-        let folderPath = targetPath + "/Sicherung"
-        // Check if the folder already exists
-        TerminalClient.runCommandOpen("mkdir -p \(folderPath)")
-
-        // Convert targetPath to URL
-        let targetURL = URL(fileURLWithPath: folderPath)
-        let targetRootURL = targetURL.deletingLastPathComponent()
-        
-        guard let errorLogFile = FileLogger.createErrorLog(
-            targetPath: targetRootURL,
-            userName: currentUserName
-        ) else {
-            print("Failed to create error log file.")
-            return
-        }
-        
-        // Create log file
-        guard let logFileURL = FileLogger.createCopyLog(
-            sourcePaths: selectedPaths,
-            targetPath: targetRootURL,
-            userName: currentUserName
-        ) else {
-            FileLogger.appendToLog(logFileURL: errorLogFile, message: "Failed to create log file.")
-            return
-        }
-        
-        FileLogger.createDeviceLog(
-            targetPath: targetRootURL,
-            userName: currentUserName
         )
-        
-        FileLogger.appendToLog(
-            logFileURL: logFileURL,
-            message: "\(FileLogger.createCurrentTimeStamp()) | Device Log created"
-        )
-        
-        FileLogger.appendToLog(
-            logFileURL: logFileURL,
-            message: "\(FileLogger.createCurrentTimeStamp()) | Error Log created \n"
-        )
-        
-        // Perform the copy operations asynchronously
-        for path in selectedPaths {
-            progressMessagePath = "Current Path: \(path.absoluteString)"
-            let lastSourceComponent = path.lastPathComponent
-            
-            // create root folder for each dir
-            let newTargetUrl = targetURL.appendingPathComponent(lastSourceComponent)
-            do {
-                try FileManager.default.createDirectory(at: newTargetUrl, withIntermediateDirectories: true, attributes: nil)
-                
-                FileLogger.appendToLog(
-                    logFileURL: logFileURL,
-                    message: "\n\nCreated Root Folder: \(lastSourceComponent)"
-                )
-            }
-            catch
-                {
-                FileLogger.appendToLog(
-                    logFileURL: errorLogFile,
-                    message: "\nFailed to create Root Folder: \(lastSourceComponent)"
-                )
-            }
-            
-            CopyClient().copyFiles(sourcePath: path, targetPath: newTargetUrl, statusLog: logFileURL, errorLog: errorLogFile)
-            
-            progressCount += 1
-            progress = Double(progressCount) / Double(selectedPaths.count + 2)
-            
-            let percentage = (progress * 100).rounded()
-            progressMessage = "\(Int(percentage))%"
-        }
-        
-        if (containerCreation) {
-            // Create DMG
-            progressMessagePath = Localizable("dmg_creation_step")
-            await CopyClient().createDMG(targetUrl: targetURL)
-            progressCount += 1
-            progress = Double(progressCount) / Double(selectedPaths.count + 2)
-            progressMessage = "\(Int((progress * 100).rounded()))%"
-            
-            // Hash MD5 DMG
-            progressMessagePath = Localizable("md5_creation_step")
-            let dmgName = targetURL.lastPathComponent
-            let finalTargetPath = targetURL.deletingLastPathComponent()
-            let dmgUrl = finalTargetPath.appendingPathComponent("\(dmgName).dmg")
-            
-            let md5Hash = await CopyClient().md5OfDMG(dmgUrl: dmgUrl)
-            progressCount += 1
-            progress = Double(progressCount) / Double(selectedPaths.count + 2)
-            progressMessage = "\(Int((progress * 100).rounded()))%"
-            
-            FileLogger.appendToLog(logFileURL: logFileURL, message: """
-            \n\n
-            MD5 Hash Log
-            -----------------
-            Date: \(FileLogger.createCurrentTimeStamp())
-            -----------------\n
-            DMG Name: \(dmgName)
-            Hash: \(md5Hash ?? "Error")\n
-            """)
-        }
-        
-        // Update states after copying is complete
-        isCopying = false
-        finishedTask = true
-        selectedItems = [
-            "Documents": false,
-            "Downloads": false,
-            "Desktop": false,
-            "Public": false,
-            "Music": false,
-            "Movies": false,
-            "Pictures": false
-        ]
-        progress = 0.0
-        progressCount = 0
     }
 }
 
-struct LandingPage_Previews: PreviewProvider {
-    static var previews: some View {
-        LandingPage()
-    }
-}

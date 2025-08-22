@@ -12,10 +12,13 @@ button_search_up_applications = "Start Application Scan";
 app_search_up_desc = "Relevant apps will be displayed here after a scan. These apps should be reviewed and exported manually if possible.\n\n*There may be more relevant apps than listed.*";
 
 // Backup
+backup_name = "Backup";
 path_desc = "No path selected";
 directory_list_selected = "Select Backup Directories";
 target_path_select = "Target Path:";
 selected_dir_amount = "Selected Directories";
+
+backupname_info = "Backup name";
 
 dmg_container_toggle_desc = "Create DMG container and MD5 checksum";
 dmg_container_info = "The DMG container size matches the backup size.\n";
@@ -26,7 +29,7 @@ process_start = "Start Process";
 finished_task = "Finished";
 
 dmg_creation_step = "Creating DMG";
-dmg_creation_step = "Creating MD5";
+md5_creation_step = "Creating MD5";
 
 // Extras
 create_dmg = "Create DMG from Folder";

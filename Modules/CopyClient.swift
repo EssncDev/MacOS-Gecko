@@ -26,7 +26,7 @@ public class CopyClient {
     ///   - errorLog: The URL of the log file where errors encountered during the copy process will be logged.
     ///
     /// - Note: This function performs a recursive copy, meaning that subdirectories will also be copied along with their contents.
-    func copyFiles(sourcePath: URL, targetPath: URL, statusLog: URL, errorLog: URL) {
+    func copyFiles(sourcePath: URL, targetPath: URL, statusLog: URL, errorLog: URL) async {
         do {
             let fileManager = FileManager.default
             
@@ -51,7 +51,7 @@ public class CopyClient {
                         // Check if the item is a directory or a file
                         if item.hasDirectoryPath {
                             // Recursively copy the directory
-                            copyFiles(sourcePath: item, targetPath: targetItemPath, statusLog: statusLog, errorLog: errorLog)
+                            await copyFiles(sourcePath: item, targetPath: targetItemPath, statusLog: statusLog, errorLog: errorLog)
                         } else {
                             // Copy the file
                             try fileManager.copyItem(at: item, to: targetItemPath)

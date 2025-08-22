@@ -8,6 +8,13 @@
 import SwiftUI
 import AppKit
 
+struct ExtraPage_Previews: PreviewProvider {
+    static var previews: some View {
+        ExtraPage()
+    }
+}
+
+
 struct ExtraPage: View {
     
     // State Declaration
@@ -180,7 +187,7 @@ struct ExtraPage: View {
                     if components.count > 1 {
                         let hash = components[0]
                         let filePath = components[1]
-                        FileLogger.appendToLog(logFileURL: logFileURL, message: "MD5 Hash for \(filePath): \(hash)")
+                        FileLogger.appendToLog(logFileURL: logFileURL, message: "MD5 Hash: \(filePath) \(hash)\n")
                     }
                 }
             }
@@ -393,6 +400,5 @@ struct ExtraPage: View {
                 }
             }
         )
-        
     }
 }
