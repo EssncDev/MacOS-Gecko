@@ -7,6 +7,12 @@
 
 import SwiftUI
 
+struct SettingsPage_Previews: PreviewProvider {
+    static var previews: some View {
+        SettingsPage()
+    }
+}
+
 struct SettingsPage: View {
     
     @AppStorage("isDarkMode") private var isDarkMode: Bool = true
