@@ -4,6 +4,8 @@
 //
 //  Created by DF-Augsburg on 07.07.25.
 //
+// Deprecated since 07/2025
+// Same features now under "extras"
 
 
 import SwiftUI

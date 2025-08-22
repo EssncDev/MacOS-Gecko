@@ -16,6 +16,9 @@ struct ExtraPage: View {
     @State private var isProcessing = false
     @State private var popupMessage = "Starting..."
     
+    @AppStorage("selectedLanguage") private var selectedLanguage: String = "German"
+    @ObservedObject private var localization = LocalizationManager.shared
+    
     /// Opens a file picker dialog to allow the user to select a folder, then starts the DMG creation process for the selected folder.
     ///
     /// This function presents a dialog (using `NSOpenPanel`) that allows the user to choose a directory.
@@ -233,27 +236,23 @@ struct ExtraPage: View {
     func openPasswords() {
         TerminalClient.runCommandOpen("open -a passwords.app")
     }
+    
+    func openActivityMonitor() {
+        TerminalClient.runCommandOpen("open -a 'Activity Monitor'")
+    }
 
     var body: some View {
         VStack {
             // Headline und User
-            Text("MacOSGecko")
-                .font(.title)
-                .fontWeight(.bold)
-                .foregroundColor(Color.green)
-                .multilineTextAlignment(.center)
-                .lineLimit(1)
-                .padding(.top, 10.0)
-            Text("User: \(currentUserName)")
-                .font(.subheadline)
-                .fontWeight(.bold)
-                .padding()
+            UserHeaderView()
+            
+            Spacer()
             
             List {
                 VStack(alignment: .leading){
                     Button(action: createDMG) {
                         HStack {
-                            Text("Erstelle DMG von Ordner")
+                            Text(Localizable("create_dmg"))
                             Spacer()
                         }
                     }
@@ -266,7 +265,7 @@ struct ExtraPage: View {
                         }
                     }
                     
-                    Text("Erstellt einen Container aus ausgewähltem Ordner inkl. Unterordnern")
+                    Text(Localizable("create_dmg_description"))
                         .font(.subheadline)
                         .foregroundColor(Color.gray)
                         .multilineTextAlignment(.leading)
@@ -276,7 +275,7 @@ struct ExtraPage: View {
                 VStack(alignment: .leading){
                     Button(action: hashData) {
                         HStack {
-                            Text("Ordner hashen")
+                            Text(Localizable("hash_folder"))
                             Spacer()
                         }
                     }
@@ -289,7 +288,7 @@ struct ExtraPage: View {
                         }
                     }
                     
-                    Text("Erstellt eine Prüfsumme aus ausgewähltem Ordner")
+                    Text(Localizable("hash_folder_description"))
                         .font(.subheadline)
                         .foregroundColor(Color.gray)
                         .multilineTextAlignment(.leading)
@@ -299,7 +298,7 @@ struct ExtraPage: View {
                 VStack(alignment: .leading){
                     Button(action: exportDeviceInfo) {
                         HStack {
-                            Text("Geräteinformationen exportieren")
+                            Text(Localizable("export_device_info"))
                             Spacer()
                         }
                     }
@@ -312,7 +311,7 @@ struct ExtraPage: View {
                         }
                     }
                     
-                    Text("Exportiert die Geräteinformationen inkl. Datenträgereigenschaften in eine Textdatei")
+                    Text(Localizable("export_device_info_description"))
                         .font(.subheadline)
                         .foregroundColor(Color.gray)
                         .multilineTextAlignment(.leading)
@@ -322,7 +321,7 @@ struct ExtraPage: View {
                 VStack(alignment: .leading){
                     Button(action: openPasswords) {
                         HStack {
-                            Text("Passwörter öffnen")
+                            Text(Localizable("open_passwords"))
                             Spacer()
                         }
                     }
@@ -335,16 +334,41 @@ struct ExtraPage: View {
                         }
                     }
                     
-                    Text("Export der Passwörter:\n1) Passwörter-App aufrufen über Button\n2) App mit Benutzerkennwort entsperren\n3) Menüleiste 'Ablage' 'Alle Passwörter in eine Datei exportieren'")
+                    Text(Localizable("open_passwords_description"))
                         .font(.subheadline)
                         .foregroundColor(Color.gray)
                         .multilineTextAlignment(.leading)
                         .padding(.leading, CGFloat(vstackTextPadding))
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(alignment: .leading)
+                
+                VStack(alignment: .leading){
+                    Button(action: openActivityMonitor) {
+                        HStack {
+                            Text(Localizable("open_activity_monitor"))
+                            Spacer()
+                        }
+                    }
+                    .padding(.vertical, CGFloat(lineThikness))
+                    .onHover { hovering in
+                        if hovering {
+                            NSCursor.pointingHand.set()  // Set hand cursor
+                        } else {
+                            NSCursor.arrow.set()  // Reset to default
+                        }
+                    }
+                    
+                    Text(Localizable("open_activity_monitor_description"))
+                        .font(.subheadline)
+                        .foregroundColor(Color.gray)
+                        .multilineTextAlignment(.leading)
+                        .padding(.leading, CGFloat(vstackTextPadding))
+                }
+            }
+            .onChange(of: selectedLanguage) { _, newValue in
+                localization.selectedLanguage = newValue
             }
         }
-        .padding()
         .overlay(
             Group {
                 if isProcessing {
@@ -369,5 +393,6 @@ struct ExtraPage: View {
                 }
             }
         )
+        
     }
 }

@@ -10,13 +10,13 @@ import AppKit
 
 struct LandingPage: View {
     @State private var selectedItems: [String: Bool] = [
-        "Dokumente": true,
+        "Documents": true,
         "Downloads": true,
-        "Schreibtisch": true,
-        "Öffentlich": false,
-        "Musik": false,
-        "Filme": false,
-        "Bilder": false
+        "Desktop": true,
+        "Public": false,
+        "Music": false,
+        "Movies": false,
+        "Pictures": false
     ]
     
     @State public var isCopying: Bool = false // state if copying is in progress or not
@@ -28,6 +28,10 @@ struct LandingPage: View {
     @State public var folderCountMax = 7
     @State private var containerCreation : Bool = true
     
+    @AppStorage("isDarkMode") private var isDarkMode: Bool = true
+    @AppStorage("selectedLanguage") private var selectedLanguage: String = "German"
+    @ObservedObject private var localization = LocalizationManager.shared
+    
     // Base path for user directories
     let userDirectory = FileManager.default.homeDirectoryForCurrentUser
     // Get the current username
@@ -35,29 +39,20 @@ struct LandingPage: View {
         return NSFullUserName()
     }
     // State variable for target path
-    @State private var targetPath: String = "Kein Ort ausgewählt"
+    @State private var targetPath: String = Localizable("path_desc")
+    @State private var targetPathIsSet: Bool = false
 
     var body: some View {
         VStack {
-            // Headline and user
-            Text("MacOSGecko")
-                .font(.title)
-                .fontWeight(.bold)
-                .foregroundColor(Color.green)
-                .multilineTextAlignment(.center)
-                .lineLimit(1)
-                .padding(.top, 10.0)
-            Text("User: \(currentUserName)")
-                .font(.subheadline)
-                .fontWeight(.bold)
-                .padding()
+            UserHeaderView()
+            
+            Spacer()
             
             // List of directories
             List {
-                Text("Auswahl der zu kopierenden Verzeichnisse")
+                Text(Localizable("directory_list_selected"))
                 ForEach(selectedItems.keys.sorted(), id: \.self) { key in
                     if let isSelected = selectedItems[key] {
-                        
                         HStack {
                             Toggle(isOn: Binding(
                                 get: { isSelected },
@@ -74,7 +69,7 @@ struct LandingPage: View {
             .frame(height: CGFloat(30 * folderCountMax))
             
             // Status info text
-            Text("\(selectedCount()) Verzeichnis\(selectedCount() == 1 ? "" : "se") ausgewählt")
+            Text(Localizable("selected_dir_amount") + ": \(selectedCount())")
                 .multilineTextAlignment(.center)
                 .lineLimit(1)
                 .padding(.vertical, 2.5)
@@ -83,7 +78,7 @@ struct LandingPage: View {
             
             // Target folder selection
             HStack {
-                Text("Zielpfad wählen:")
+                Text(Localizable("target_path_select"))
                     .font(.headline)
                 
                 Button(action: selectTargetFolder) {
@@ -109,10 +104,10 @@ struct LandingPage: View {
                 
             // Create DMG + MD5 selection
             VStack {
-                Toggle("DMG-Container und MD5-Hash erstellen:", isOn: $containerCreation)
+                Toggle(Localizable("dmg_container_toggle_desc"), isOn: $containerCreation)
                     .toggleStyle(SwitchToggleStyle(tint: .green))
                     
-                Text("Das zusätzliche Erstellen eines Containers benötigt die doppelte Menge an Speicherplatz!\n")
+                Text(Localizable("dmg_container_info"))
                     .font(.footnote)
                     .multilineTextAlignment(.center)
             }
@@ -124,13 +119,13 @@ struct LandingPage: View {
                     selectAll()
                 }) {
                     if selectedCount() != folderCountMax {
-                        Text("Alle auswählen")
+                        Text(Localizable("select_all_elements"))
                             .font(.headline)
                             .padding()
                             .background(Color.blue)
                             .cornerRadius(15)
                     } else {
-                        Text("Alle abwählen")
+                        Text(Localizable("unselect_all_elements"))
                             .font(.headline)
                             .padding()
                             .background(Color.blue)
@@ -154,7 +149,7 @@ struct LandingPage: View {
                     }
                     isCopying = true
                 }) {
-                    Text("Vorgang starten")
+                    Text(Localizable("process_start"))
                         .font(.headline)
                         .padding()
                         .background(Color.green)
@@ -187,34 +182,15 @@ struct LandingPage: View {
             }
                 
             if finishedTask {
-                Text("Fertiggestellt!")
+                Text(Localizable("finished_task") + "!")
                     .font(.headline)
                     .foregroundColor(.green)
                     .padding()
             }
         }
         .frame(alignment: .top)
-    }
-
-    // Function to return a description based on the directory name
-    private func getDescription(for key: String) -> String {
-        switch key {
-        case "Dokumente":
-            return "Alle Dateien und Ordner in Dokumente"
-        case "Downloads":
-            return "Alle Dateien und Ordner in Downloads"
-        case "Schreibtisch":
-            return "Alle Dateien und Ordner des Schreibtisches"
-        case "Musik":
-            return "Gesamten Ordner 'Musik'"
-        case "Öffentlich":
-            return "Gesamten Ordner 'Öffentlich'"
-        case "Bilder":
-            return "Gesamten Ordner 'Bilder'"
-        case "Filme":
-            return "Gesamten Ordner 'Filme'"
-        default:
-            return ""
+        .onChange(of: selectedLanguage) { _, newValue in
+            localization.selectedLanguage = newValue
         }
     }
 
@@ -236,6 +212,7 @@ struct LandingPage: View {
                 if let url = openPanel.url {
                     DispatchQueue.main.async {
                         self.targetPath = url.path
+                        targetPathIsSet = true
                     }
                 }
             }
@@ -252,29 +229,7 @@ struct LandingPage: View {
 
     // Computed property to determine if the copy button should be enabled
     private var isCopyButtonEnabled: Bool {
-        return selectedCount() > 0 && targetPath != "Kein Ort ausgewählt"
-    }
-    
-    // Switch Function
-    public func SwitchFolderNames(folderName: String) -> String {
-        switch folderName {
-        case "Dokumente":
-            return "Documents"
-        case "Downloads":
-            return "Downloads"
-        case "Schreibtisch":
-            return "Desktop"
-        case "Musik":
-            return "Music"
-        case "Öffentlich":
-            return "Public"
-        case "Bilder":
-            return "Pictures"
-        case "Filme":
-            return "Movies"
-        default:
-            return ""
-        }
+        return selectedCount() > 0 && targetPathIsSet != false
     }
     
     // Asynchronous function to start copying
@@ -282,7 +237,7 @@ struct LandingPage: View {
         let selectedKeys = selectedItems.filter { $0.value }.map { $0.key }
         var selectedPaths: [URL] = []
         for key in selectedKeys {
-            selectedPaths.append(userDirectory.appendingPathComponent(SwitchFolderNames(folderName: key)))
+            selectedPaths.append(userDirectory.appendingPathComponent(key))
         }
         let folderPath = targetPath + "/Sicherung"
         // Check if the folder already exists
@@ -292,13 +247,21 @@ struct LandingPage: View {
         let targetURL = URL(fileURLWithPath: folderPath)
         let targetRootURL = targetURL.deletingLastPathComponent()
         
+        guard let errorLogFile = FileLogger.createErrorLog(
+            targetPath: targetRootURL,
+            userName: currentUserName
+        ) else {
+            print("Failed to create error log file.")
+            return
+        }
+        
         // Create log file
         guard let logFileURL = FileLogger.createCopyLog(
             sourcePaths: selectedPaths,
             targetPath: targetRootURL,
             userName: currentUserName
         ) else {
-            print("Failed to create log file.")
+            FileLogger.appendToLog(logFileURL: errorLogFile, message: "Failed to create log file.")
             return
         }
         
@@ -311,14 +274,6 @@ struct LandingPage: View {
             logFileURL: logFileURL,
             message: "\(FileLogger.createCurrentTimeStamp()) | Device Log created"
         )
-        
-        guard let errorLogFile = FileLogger.createErrorLog(
-            targetPath: targetRootURL,
-            userName: currentUserName
-        ) else {
-            print("Failed to create error log file.")
-            return
-        }
         
         FileLogger.appendToLog(
             logFileURL: logFileURL,
@@ -342,7 +297,10 @@ struct LandingPage: View {
             }
             catch
                 {
-                print("Failed to create root folder for \(path.absoluteString)")
+                FileLogger.appendToLog(
+                    logFileURL: errorLogFile,
+                    message: "\nFailed to create Root Folder: \(lastSourceComponent)"
+                )
             }
             
             CopyClient().copyFiles(sourcePath: path, targetPath: newTargetUrl, statusLog: logFileURL, errorLog: errorLogFile)
@@ -356,14 +314,14 @@ struct LandingPage: View {
         
         if (containerCreation) {
             // Create DMG
-            progressMessagePath = "Erstelle DMG"
+            progressMessagePath = Localizable("dmg_creation_step")
             await CopyClient().createDMG(targetUrl: targetURL)
             progressCount += 1
             progress = Double(progressCount) / Double(selectedPaths.count + 2)
             progressMessage = "\(Int((progress * 100).rounded()))%"
             
             // Hash MD5 DMG
-            progressMessagePath = "Erstelle MD5 Hash"
+            progressMessagePath = Localizable("md5_creation_step")
             let dmgName = targetURL.lastPathComponent
             let finalTargetPath = targetURL.deletingLastPathComponent()
             let dmgUrl = finalTargetPath.appendingPathComponent("\(dmgName).dmg")
@@ -380,7 +338,7 @@ struct LandingPage: View {
             Date: \(FileLogger.createCurrentTimeStamp())
             -----------------\n
             DMG Name: \(dmgName)
-            Hash: \(md5Hash ?? "Fehler")\n
+            Hash: \(md5Hash ?? "Error")\n
             """)
         }
         
@@ -388,14 +346,13 @@ struct LandingPage: View {
         isCopying = false
         finishedTask = true
         selectedItems = [
-            "Dokumente": false,
+            "Documents": false,
             "Downloads": false,
-            "Schreibtisch": false,
-            "Öffentlich": false,
-            "Musik": false,
-            "Filme": false,
-            "Bilder": false,
-            "Papierkorb": false
+            "Desktop": false,
+            "Public": false,
+            "Music": false,
+            "Movies": false,
+            "Pictures": false
         ]
         progress = 0.0
         progressCount = 0

@@ -7,15 +7,15 @@
 
 import SwiftUI
 
-// Get the current username
-var currentUserName: String {
-    return NSFullUserName()
-}
-
 // Base Path for user home dir
 let userDirectory = FileManager.default.homeDirectoryForCurrentUser
 
 struct NotificationPage: View {
+    
+    @AppStorage("isDarkMode") private var isDarkMode: Bool = true
+    @AppStorage("selectedLanguage") private var selectedLanguage: String = "German"
+    @ObservedObject private var localization = LocalizationManager.shared
+    
     @State private var applicationList = ""
     @State private var filteredApps: [String] = []
     @State private var searchButtonHide: Bool = false;
@@ -43,46 +43,20 @@ struct NotificationPage: View {
         }
     }
     
-    func prepareAppDesc(appName: String) -> String {
-        switch appName {
-        case "Dropbox.app":
-            return "Cloud-Backup-App"
-        case "Parallels Desktop.app":
-            return "Virtualisierungssoftware"
-        case "Mail.app":
-            return "Apple Mail-App"
-        case "OneDrive.app":
-            return "Cloud-Backup-App"
-        case "Microsoft Outlook.app":
-            return "Mail-App"
-        default:
-            return "..."
-        }
-    }
-    
     var body: some View {
         VStack {
             // Headline and user
-            Text("MacOSGecko")
-                .font(.title)
-                .fontWeight(.bold)
-                .foregroundColor(Color.green)
-                .multilineTextAlignment(.center)
-                .lineLimit(1)
-                .padding(.top, 10.0)
-            Text("User: \(currentUserName)")
-                .font(.subheadline)
-                .fontWeight(.bold)
-                .padding()
+            UserHeaderView()
             
+            Spacer()
             
-            Text("Relevante Apps werden hier nach einem Durchlauf angezeigt. Relevante Apps sollten durchgeschaut und nach Möglichkeit manuell exportiert werden.\n\n*Es können mehr relevante Apps vorhanden sein, als aufgeführt.*")
+            Text(Localizable("app_search_up_desc"))
                 .font(.subheadline)
                 .foregroundColor(Color.gray)
                 .multilineTextAlignment(.center)
             
             if !searchButtonHide {
-                Button("App Durchlauf starten") {
+                Button(Localizable("button_search_up_applications")) {
                     // Fetch the application list and filter it
                     applicationList = fetchApplicationList()
                     filteredApps = filterApplicationList(applicationList, filterTerms: appsToFilter)
@@ -99,24 +73,18 @@ struct NotificationPage: View {
                     }
                 }
             }
+            Spacer()
             
-
             // Display the filtered application list if it's not empty
             if !filteredApps.isEmpty {
-                ScrollView { // Use ScrollView to allow scrolling if there are many apps
+                ScrollView {
+                    // Use ScrollView to allow scrolling if there are many apps
                     VStack(alignment: .leading) {
                         ForEach(filteredApps, id: \.self) { app in
                             let charLenght = app.count
-                            let appDesc = prepareAppDesc(appName: app)
                             HStack {
                                 HStack{
                                     Text("\(app.prefix(charLenght - 4))")
-                                        .padding(15)
-                                    
-                                    
-                                    Text("(\(appDesc))")
-                                        .font(.footnote)
-                                        .multilineTextAlignment(.center)
                                         .padding(15)
                                 }
                                 .frame(maxWidth: .infinity, alignment: .leading) // Make each Text view expand to full width
@@ -127,7 +95,7 @@ struct NotificationPage: View {
                                 Button(action: {
                                     TerminalClient.runCommandOpen("open -a \"\(app)\"")
                                 }) {
-                                    Text("App öffnen")
+                                    Text(Localizable("button_open_app"))
                                 }.foregroundColor(Color(red: 1.0, green: 0.0, blue: 0.0))
                                     .onHover { hovering in
                                         if hovering {
@@ -142,7 +110,7 @@ struct NotificationPage: View {
                                     let appUrl = prepareAppLibURL(appName: app)
                                     TerminalClient.runCommandOpen("open \"\(appUrl)\"")
                                 }) {
-                                    Text("Verzeichnis öffnen")
+                                    Text(Localizable("button_open_folder"))
                                 }.foregroundColor(Color(red: 1.0, green: 0.0, blue: 0.0))
                                     .onHover { hovering in
                                         if hovering {
@@ -159,6 +127,9 @@ struct NotificationPage: View {
                     .padding()
                 }
             }
+        }
+        .onChange(of: selectedLanguage) { _, newValue in
+            localization.selectedLanguage = newValue
         }
     }
 }

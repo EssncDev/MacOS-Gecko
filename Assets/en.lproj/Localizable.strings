@@ -1,0 +1,45 @@
+// UI
+application_tab = "Applications";
+backup_tab = "Backup";
+extra_tab = "Extras";
+settings_tab = "Settings";
+
+// Application
+button_open_app = "Open App";
+button_open_folder = "Open Library Folder";
+
+button_search_up_applications = "Start Application Scan";
+app_search_up_desc = "Relevant apps will be displayed here after a scan. These apps should be reviewed and exported manually if possible.\n\n*There may be more relevant apps than listed.*";
+
+// Backup
+path_desc = "No path selected";
+directory_list_selected = "Select Backup Directories";
+target_path_select = "Target Path:";
+selected_dir_amount = "Selected Directories";
+
+dmg_container_toggle_desc = "Create DMG container and MD5 checksum";
+dmg_container_info = "The DMG container size matches the backup size.\n";
+
+select_all_elements = "Select All";
+unselect_all_elements = "Unselect All";
+process_start = "Start Process";
+finished_task = "Finished";
+
+dmg_creation_step = "Creating DMG";
+dmg_creation_step = "Creating MD5";
+
+// Extras
+create_dmg = "Create DMG from Folder";
+create_dmg_description = "Creates a container from the selected folder, including subfolders.";
+
+hash_folder = "Hash Folder";
+hash_folder_description = "Generates a checksum from the selected folder.";
+
+export_device_info = "Export Device Info";
+export_device_info_description = "Exports device information, including disk properties, to a text file.";
+
+open_passwords = "Open Passwords";
+open_passwords_description = "Export passwords:\n1) Open the Passwords app\n2) Unlock the app with your password\n3) In the menu bar, choose 'File' > 'Export All Passwords'";
+
+open_activity_monitor = "Open Activity Monitor";
+open_activity_monitor_description = "Monitor application activity.";

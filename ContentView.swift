@@ -7,35 +7,39 @@
 
 import SwiftUI
 
+
 struct ContentView: View {
+    
+    @AppStorage("isDarkMode") private var isDarkMode: Bool = true
+    @AppStorage("selectedLanguage") private var selectedLanguage: String = "German"
+    @ObservedObject private var localization = LocalizationManager.shared
+
     var body: some View {
         TabView {
             NotificationPage()
                 .tabItem {
-                    Label("Applikationen", systemImage: "info")
+                    Label(Localizable("application_tab"), systemImage: "info")
                         .font(.system(size: 18, weight: .bold))  // Adjust the font size and weight
                         .imageScale(.large)  // Make the icon larger
                 }
-            
-            /*
-             PasswordPage()
-                .tabItem {
-                    Label("Passwörter", systemImage: "opticaldiscdrive")
-                        .font(.system(size: 18, weight: .bold))  // Adjust the font size and weight
-                        .imageScale(.large)  // Make the icon larger
-                }
-             */
             
             LandingPage()
                 .tabItem {
-                    Label("Sicherung", systemImage: "opticaldiscdrive")
+                    Label(Localizable("backup_tab"), systemImage: "opticaldiscdrive")
                         .font(.system(size: 18, weight: .bold))  // Adjust the font size and weight
                         .imageScale(.large)  // Make the icon larger
                 }
             
             ExtraPage()
                 .tabItem {
-                    Label("Extra", systemImage: "opticaldiscdrive")
+                    Label(Localizable("extra_tab"), systemImage: "opticaldiscdrive")
+                        .font(.system(size: 18, weight: .bold))  // Adjust the font size and weight
+                        .imageScale(.large)  // Make the icon larger
+                }
+            
+            SettingsPage()
+                .tabItem {
+                    Label(Localizable("settings_tab"), systemImage: "info")
                         .font(.system(size: 18, weight: .bold))  // Adjust the font size and weight
                         .imageScale(.large)  // Make the icon larger
                 }
@@ -43,7 +47,12 @@ struct ContentView: View {
         .padding()
         .tabViewStyle(DefaultTabViewStyle())  // Optional: Der Default-TabView-Stil
                 .padding(.top, 0)  // Kein Padding oben für die TabView
+        .preferredColorScheme(isDarkMode ? .dark : .light)
+        .onChange(of: selectedLanguage) { _, newValue in
+            localization.selectedLanguage = newValue
+        }
     }
+    
 }
 
 struct ContentView_Previews: PreviewProvider {

@@ -29,7 +29,7 @@ Best of all, **MacOS-Gecko** can run without requiring admin rights and can be e
 
 ### Steps:
 
-1. Download the latest release from the [Releases page](https://github.com/EssncDev/MacOS-Gecko/releases).
+1. Download the latest release from "releases" branch in necessary version.
 2. Extract the files (if needed).
 3. Run the `MacOS-Gecko` executable directly from the folder or external drive.
 
@@ -43,6 +43,7 @@ Run the program from any location, and it will automatically identify standard M
 * Photos
 * Videos
 * Downloads
+* Documents
 * Public
 
 It will then copy these directories to a user-defined location or external drive.
