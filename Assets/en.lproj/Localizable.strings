@@ -18,7 +18,8 @@ directory_list_selected = "Select Backup Directories";
 target_path_select = "Target Path:";
 selected_dir_amount = "Selected Directories";
 
-backupname_info = "Backup name";
+backupname_info = "Backup Name";
+backupname_placeholder = "Enter a Backup Name here";
 
 dmg_container_toggle_desc = "Create DMG container and MD5 checksum";
 dmg_container_info = "The DMG container size matches the backup size.\n";

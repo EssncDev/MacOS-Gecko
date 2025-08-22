@@ -1,5 +1,5 @@
 //
-//  LocalizationsClient.swift
+//  LocalizationsManager.swift
 //  MacOSGecko
 //
 //  Created by DF-Augsburg on 22.08.25.
