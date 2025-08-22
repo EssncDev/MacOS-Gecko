@@ -1,7 +1,3 @@
-Here’s a simple yet detailed README for your "MacOS-Gecko" project:
-
----
-
 # MacOS-Gecko
 
 **MacOS-Gecko** is a versatile program designed to standardize the process of copying important MacOS directories, including Desktop, Photos, Videos, and Downloads. The application is primarily built for data backup and archival purposes but can be utilized in various use cases that require the secure transfer and storage of MacOS data.
@@ -79,10 +75,4 @@ All actions, including errors and results, will be logged into a text file. This
 
 ## Contributing
 
-Feel free to fork the repository, make changes, and submit pull requests! If you have any feature requests or bug reports, open an issue on the [Issues page](https://github.com/yourusername/MacOS-Gecko/issues).
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
+Feel free to fork the repository, make changes, and submit pull requests! If you have any feature requests or bug reports, open an issue on the [Issues page](https://github.com/EssncDev/MacOS-Gecko/issues).

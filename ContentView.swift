@@ -51,6 +51,7 @@ struct ContentView: View {
         .onChange(of: selectedLanguage) { _, newValue in
             localization.selectedLanguage = newValue
         }
+        .frame(width: 375, height: 720)
     }
     
 }

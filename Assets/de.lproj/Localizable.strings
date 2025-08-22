@@ -1,49 +1,49 @@
 // UI
 application_tab = "Applikationen";
 backup_tab = "Sicherung";
-extra_tab = "Extra";
-settings_tab = "Settings";
+extra_tab = "Extras";
+settings_tab = "Einstellungen";
 
 // Applications
 button_open_app = "App öffnen";
-button_open_folder = "Verzeischnis öffnen";
+button_open_folder = "Verzeichnis öffnen";
 
 button_search_up_applications = "Durchlauf starten";
-app_search_up_desc = "Relevante Apps werden hier nach einem Durchlauf angezeigt. Relevante Apps sollten durchgeschaut und nach Möglichkeit manuell exportiert werden.\n\n*Es können mehr relevante Apps vorhanden sein, als aufgeführt.*";
+app_search_up_desc = "Relevante Apps werden nach einem Durchlauf hier angezeigt. Diese sollten überprüft und nach Möglichkeit manuell exportiert werden.\n\n*Es können mehr relevante Apps vorhanden sein, als hier aufgeführt.*";
 
 // Backup
 backup_name = "Sicherung";
 path_desc = "Kein Pfad ausgewählt";
-directory_list_selected = "Auswahl der zu kopierenden Verzeichnisse";
-target_path_select = "Zielpfad wählen:";
-selected_dir_amount = "Augewählte Verzeichnisse";
+directory_list_selected = "Zu sichernde Verzeichnisse auswählen";
+target_path_select = "Zielpfad:";
+selected_dir_amount = "Ausgewählte Verzeichnisse";
 
 backupname_info = "Bezeichnung";
+backupname_placeholder = "Bezeichnung für die Sicherung eingeben";
 
 dmg_container_toggle_desc = "DMG-Container und MD5-Hash erstellen:";
-dmg_container_info = "Das zusätzliche Erstellen eines Containers benötigt die doppelte Menge an Speicherplatz!\n";
+dmg_container_info = "Das Erstellen eines Containers benötigt zusätzlichen Speicherplatz (mindestens die Größe der Sicherung erneut).\n";
 
 select_all_elements = "Alle auswählen";
 unselect_all_elements = "Alle abwählen";
 process_start = "Vorgang starten";
-finished_task = "Fertiggestellt";
+finished_task = "Abgeschlossen";
 
 dmg_creation_step = "Erstelle DMG";
 md5_creation_step = "Erstelle MD5";
 
 // Extras
-create_dmg = "Erstelle DMG von Ordner";
-create_dmg_description = "Erstellt einen Container aus ausgewähltem Ordner inkl. Unterordnern";
+create_dmg = "DMG aus Ordner erstellen";
+create_dmg_description = "Erstellt einen Container aus dem ausgewählten Ordner, inklusive Unterordner.";
 
 hash_folder = "Ordner hashen";
-hash_folder_description = "Erstellt eine Prüfsumme aus ausgewähltem Ordner";
+hash_folder_description = "Erstellt eine Prüfsumme des ausgewählten Ordners.";
 
 export_device_info = "Geräteinformationen exportieren";
-export_device_info_description = "Exportiert die Geräteinformationen inkl. Datenträgereigenschaften in eine Textdatei";
+export_device_info_description = "Exportiert Geräteinformationen inklusive Datenträgereigenschaften in eine Textdatei.";
 
 open_passwords = "Passwörter öffnen";
-open_passwords_description = "Export der Passwörter:\n1) Passwörter-App aufrufen über Button\n2) App mit Benutzerkennwort entsperren\n3) Menüleiste 'Ablage' 'Alle Passwörter in eine Datei exportieren'";
+open_passwords_description = "Export der Passwörter:\n1) Passwörter-App über den Button öffnen\n2) App mit Benutzerkennwort entsperren\n3) In der Menüleiste 'Ablage' > 'Alle Passwörter in eine Datei exportieren' wählen.";
 
 open_activity_monitor = "Aktivitätenanzeige öffnen";
-open_activity_monitor_description = "Beobachten der Anwendungs-Aktivitäten";
-
+open_activity_monitor_description = "Zur Überwachung der Anwendungsaktivitäten.";

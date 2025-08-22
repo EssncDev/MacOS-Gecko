@@ -8,6 +8,7 @@
 import Foundation
 
 class FileLogger {
+    
     /// Creates a log file with detailed information about the copy operation
     /// - Parameters:
     ///   - sourcePaths: Array of source file paths being copied

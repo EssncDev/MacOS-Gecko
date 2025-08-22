@@ -285,7 +285,7 @@ struct LandingPage: View {
                 Text(Localizable("backupname_info") + ":")
                     .font(.headline)
                 
-                TextField("Enter a name for the backup", text: $backupName)
+                TextField(Localizable("backupname_placeholder"), text: $backupName)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 250)
             }
