@@ -82,6 +82,8 @@ All actions, including errors and results, will be logged into a text file. This
 ## Contributing
 
 Feel free to fork the repository, make changes, and submit pull requests! If you have any feature requests or bug reports, open an issue on the [Issues page](https://github.com/EssncDev/MacOS-Gecko/issues).
+
+</br>
 </br>
 <img src="./Assets/Pictures/Applications.png" alt="Init" width="40%" />
 <img src="./Assets/Pictures/Settings_DarkMode.png" alt="Init" width="40%" />
