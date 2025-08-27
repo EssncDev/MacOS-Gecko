@@ -19,7 +19,7 @@ class LocalizationManager: ObservableObject {
     private(set) var bundle: Bundle = .main
 
     private init() {
-        let saved = UserDefaults.standard.string(forKey: "selectedLanguage") ?? "English"
+        let saved = UserDefaults.standard.string(forKey: "selectedLanguage") ?? "German   "
         self.selectedLanguage = saved
         setLanguage(saved)
     }
