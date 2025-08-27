@@ -26,7 +26,6 @@ Best of all, **MacOS-Gecko** can run without requiring admin rights and can be e
 ### Requirements:
 
 * MacOS Version 11.5 or higher to run the deployment App
-* 
 * No admin rights required for installation or operation.
 
 ### Steps:
