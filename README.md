@@ -2,6 +2,8 @@
 
 **MacOS-Gecko** is a versatile program designed to standardize the process of copying important MacOS directories, including Desktop, Photos, Videos, and Downloads. The application is primarily built for data backup and archival purposes but can be utilized in various use cases that require the secure transfer and storage of MacOS data.
 
+![Project Screenshot](./Assets/Pictures/Backup.png)
+
 The program also generates a MD5 hash and a DMG container of the copied data for integrity checks. It collects device-specific information such as memory, serial number, and installed programs, and logs detailed reports (including errors and results) for every operation.
 
 Best of all, **MacOS-Gecko** can run without requiring admin rights and can be executed directly from external drives.
@@ -14,6 +16,8 @@ Best of all, **MacOS-Gecko** can run without requiring admin rights and can be e
 * **Logging**: Tracks operation results and errors, with logs for troubleshooting.
 * **No Admin Rights Required**: Runs without requiring elevated system privileges.
 * **Portable**: Can be executed from external drives, making it easy to use across multiple machines.
+
+![Project Screenshot](./Assets/Pictures/Extras.png)
 
 ## Installation
 
@@ -76,3 +80,6 @@ All actions, including errors and results, will be logged into a text file. This
 ## Contributing
 
 Feel free to fork the repository, make changes, and submit pull requests! If you have any feature requests or bug reports, open an issue on the [Issues page](https://github.com/EssncDev/MacOS-Gecko/issues).
+
+![Project Screenshot](./Assets/Pictures/Applications.png)
+![Project Screenshot](./Assets/Pictures/Settings_DarkMode.png)
