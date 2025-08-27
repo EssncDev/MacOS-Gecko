@@ -2,7 +2,9 @@
 
 **MacOS-Gecko** is a versatile program designed to standardize the process of copying important MacOS directories, including Desktop, Photos, Videos, and Downloads. The application is primarily built for data backup and archival purposes but can be utilized in various use cases that require the secure transfer and storage of MacOS data.
 
-![Project Screenshot](./Assets/Pictures/Backup.png)
+<img src="./Assets/Pictures/Backup.png" alt="Init" width="40%" />
+
+
 
 The program also generates a MD5 hash and a DMG container of the copied data for integrity checks. It collects device-specific information such as memory, serial number, and installed programs, and logs detailed reports (including errors and results) for every operation.
 
@@ -17,14 +19,13 @@ Best of all, **MacOS-Gecko** can run without requiring admin rights and can be e
 * **No Admin Rights Required**: Runs without requiring elevated system privileges.
 * **Portable**: Can be executed from external drives, making it easy to use across multiple machines.
 
-![Project Screenshot](./Assets/Pictures/Extras.png)
+<img src="./Assets/Pictures/Extras.png" alt="Init" width="40%" />
 
 ## Installation
 
 ### Requirements:
 
 * MacOS Version 11.5 or higher to run the deployment App
-* 
 * No admin rights required for installation or operation.
 
 ### Steps:
@@ -81,5 +82,7 @@ All actions, including errors and results, will be logged into a text file. This
 
 Feel free to fork the repository, make changes, and submit pull requests! If you have any feature requests or bug reports, open an issue on the [Issues page](https://github.com/EssncDev/MacOS-Gecko/issues).
 
-![Project Screenshot](./Assets/Pictures/Applications.png)
-![Project Screenshot](./Assets/Pictures/Settings_DarkMode.png)
+</br>
+</br>
+<img src="./Assets/Pictures/Applications.png" alt="Init" width="40%" />
+<img src="./Assets/Pictures/Settings_DarkMode.png" alt="Init" width="40%" />
