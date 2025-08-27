@@ -14,7 +14,7 @@ struct ExtraPage_Previews: PreviewProvider {
     }
 }
 
-
+@available(macOS 14.0, *)
 struct ExtraPage: View {
     
     // State Declaration

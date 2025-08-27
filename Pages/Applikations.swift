@@ -10,6 +10,7 @@ import SwiftUI
 // Base Path for user home dir
 let userDirectory = FileManager.default.homeDirectoryForCurrentUser
 
+@available(macOS 14.0, *)
 struct NotificationPage: View {
     
     @AppStorage("isDarkMode") private var isDarkMode: Bool = true

@@ -13,6 +13,7 @@ struct SettingsPage_Previews: PreviewProvider {
     }
 }
 
+@available(macOS 14.0, *)
 struct SettingsPage: View {
     
     @AppStorage("isDarkMode") private var isDarkMode: Bool = true

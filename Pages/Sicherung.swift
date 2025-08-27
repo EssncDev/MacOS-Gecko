@@ -14,7 +14,7 @@ struct LandingPage_Previews: PreviewProvider {
     }
 }
 
-
+@available(macOS 14.0, *)
 struct LandingPage: View {
     
     // Function to count selected directories

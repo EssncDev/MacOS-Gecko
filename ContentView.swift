@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-
+@available(macOS 14.0, *)
 struct ContentView: View {
     
     @AppStorage("isDarkMode") private var isDarkMode: Bool = true
