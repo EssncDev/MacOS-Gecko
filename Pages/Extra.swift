@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AppKit
+import Foundation
 
 struct ExtraPage_Previews: PreviewProvider {
     static var previews: some View {
@@ -247,6 +248,33 @@ struct ExtraPage: View {
     func openActivityMonitor() {
         TerminalClient.runCommandOpen("open -a 'Activity Monitor'")
     }
+    
+    func deployShellToConvertNumbersPages2Pdf() {
+        guard let scriptPath = Bundle.main.path(forResource: "convert", ofType: "sh") else {
+            print("Script not found")
+            exit(1)
+        }
+
+        let scriptDirectory = (scriptPath as NSString).deletingLastPathComponent
+
+        let appleScript = """
+        tell application "Terminal"
+            activate
+            do script "cd \(scriptDirectory) && ./convert.sh"
+        end tell
+        """
+
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/osascript")
+        process.arguments = ["-e", appleScript]
+
+        do {
+            try process.run()
+            process.waitUntilExit()
+        } catch {
+            print("Failed to launch Terminal: \(error)")
+        }
+    }
 
     var body: some View {
         VStack {
@@ -366,6 +394,29 @@ struct ExtraPage: View {
                     }
                     
                     Text(Localizable("open_activity_monitor_description"))
+                        .font(.subheadline)
+                        .foregroundColor(Color.gray)
+                        .multilineTextAlignment(.leading)
+                        .padding(.leading, CGFloat(vstackTextPadding))
+                }
+                
+                VStack(alignment: .leading){
+                    Button(action: deployShellToConvertNumbersPages2Pdf) {
+                        HStack {
+                            Text(Localizable("convert_numbers_pages_to_pdf"))
+                            Spacer()
+                        }
+                    }
+                    .padding(.vertical, CGFloat(lineThikness))
+                    .onHover { hovering in
+                        if hovering {
+                            NSCursor.pointingHand.set()  // Set hand cursor
+                        } else {
+                            NSCursor.arrow.set()  // Reset to default
+                        }
+                    }
+                    
+                    Text(Localizable("convert_numbers_pages_to_pdf_description"))
                         .font(.subheadline)
                         .foregroundColor(Color.gray)
                         .multilineTextAlignment(.leading)

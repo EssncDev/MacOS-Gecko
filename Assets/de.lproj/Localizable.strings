@@ -47,3 +47,6 @@ open_passwords_description = "Export der Passwörter:\n1) Passwörter-App über 
 
 open_activity_monitor = "Aktivitätenanzeige öffnen";
 open_activity_monitor_description = "Zur Überwachung der Anwendungsaktivitäten.";
+
+convert_numbers_pages_to_pdf = "Konvertiere Numbers/Pages in PDF";
+convert_numbers_pages_to_pdf_description = "Konvertiere alle auffindbaren Numbers und Pages Dateien in PDFs";

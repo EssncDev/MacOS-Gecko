@@ -59,9 +59,25 @@ struct LandingPage: View {
     public func startCopy() async {
         let selectedKeys = selectedItems.filter { $0.value }.map { $0.key }
         var selectedPaths: [URL] = []
+        var selectedAdminPaths: [URL] = []
         for key in selectedKeys {
-            selectedPaths.append(userDirectory.appendingPathComponent(key))
+            if (key == "Messages") {
+                let message_path = "Library/Messages"
+                selectedAdminPaths.append(userDirectory.appendingPathComponent(message_path))
+            }
+            else if (key == "Apple Mail") {
+                let mail_path = "Library/Mail"
+                selectedAdminPaths.append(userDirectory.appendingPathComponent(mail_path))
+            }
+            else if (key == "Trash") {
+                let trash_path = ".Trash"
+                selectedAdminPaths.append(userDirectory.appendingPathComponent(trash_path))
+            }
+            else {
+                selectedPaths.append(userDirectory.appendingPathComponent(key))
+            }
         }
+        
         let folderPath = targetPath + "/\(backupName)"
         // Check if the folder already exists
         TerminalClient.runCommandOpen("mkdir -p \(folderPath)")
@@ -141,6 +157,8 @@ struct LandingPage: View {
             
             await Task.yield() // ← This forces UI to update before next iteration
         }
+        
+        // TODO Admin Paths via Mac Python 
         
         if (containerCreation) {
             progressMessagePath = ""

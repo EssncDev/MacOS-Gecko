@@ -58,4 +58,20 @@ class TerminalClient{
             }
         }
     }
+    
+    static func runPythonCommand(_ command: String) -> Bool {
+        let process = Process()
+        process.launchPath = "/usr/bin/python3"
+        process.arguments = ["-c", command]
+        
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.launch()
+        
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        if let output = String(data: data, encoding: .utf8) {
+            return true
+        }
+        return false
+    }
 }

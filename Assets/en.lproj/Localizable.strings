@@ -47,3 +47,6 @@ open_passwords_description = "Export passwords:\n1) Open the Passwords app\n2) U
 
 open_activity_monitor = "Open Activity Monitor";
 open_activity_monitor_description = "Monitor application activity.";
+
+convert_numbers_pages_to_pdf = "Convert Numbers/Pages to PDF";
+convert_numbers_pages_to_pdf_description = "Convert all Pages and Numbers Files in selected folder to PDF";

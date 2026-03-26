@@ -1,26 +1,56 @@
 #!/bin/bash
 
 ############################################
-# 1. Ordnername eingeben
+# 1.0 Eingangspfad eingeben
 ############################################
+echo "Insert Source Path (where to search for files):"
+read sourcepath
+
+# Falls leer → aktuelles Verzeichnis verwenden
+if [ -z "$sourcepath" ]; then
+    sourcepath="."
+fi
+
+# Absoluten Pfad daraus machen
+sourcepath="$(cd "$sourcepath" && pwd)"
+echo "Source: ${sourcepath}" >> "$logfile"
+
+############################################
+# 1.1 Zielpfad + Ordnername eingeben
+############################################
+
+echo "Insert Target Base Path (where to save PDFs):"
+read targetpath
+
+# Falls leer → aktuelles Verzeichnis
+if [ -z "$targetpath" ]; then
+    targetpath="."
+fi
+
+# Absoluten Pfad daraus machen
+targetpath="$(cd "$targetpath" && pwd)"
+
 echo "Insert Folder Name To Save The PDFs In:"
 read folder
 
-mkdir -p "${folder}"
+# Finaler Zielordner
+outdir="${targetpath}/${folder}"
 
-logfile="${folder}/convert.log"
+mkdir -p "$outdir"
+
+logfile="${outdir}/convert.log"
 touch "$logfile"
 
 echo "==== Convert-Log ====" >> "$logfile"
 echo "Start: $(date +"%Y-%m-%d_%H-%M-%S")" >> "$logfile"
-echo "Target: ${folder}" >> "$logfile"
+echo "Target: ${outdir}" >> "$logfile"
 echo "" >> "$logfile"
 
 ############################################
 # 2. Unterordner für Pages und Numbers anlegen
 ############################################
-subfolderPages="$(pwd)/${folder}/pages"
-subfolderNumbers="$(pwd)/${folder}/numbers"
+subfolderPages="${outdir}/pages"
+subfolderNumbers="${outdir}/numbers"
 mkdir -p "$subfolderPages"
 mkdir -p "$subfolderNumbers"
 
@@ -64,15 +94,13 @@ export IFS=$'\n'
 
 # Pages-Dateien rekursiv
 while IFS= read -r f; do
-    f="$(pwd)/${f#./}"   # Absoluter Pfad
     convert_pages "$f"
-done < <(find . -type f -name "*.pages")
+done < <(find "$sourcepath" -type f -name "*.pages")
 
 # Numbers-Dateien rekursiv
 while IFS= read -r f; do
-    f="$(pwd)/${f#./}"   # Absoluter Pfad
     convert_numbers "$f"
-done < <(find . -type f -name "*.numbers")
+done < <(find "$sourcepath" -type f -name "*.numbers")
 
 ############################################
 # 5. Abschluss
